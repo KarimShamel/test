@@ -9,10 +9,11 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   
   <script>
@@ -46,9 +47,9 @@
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
     }
 
-    /* Hide scrollbars for slick look */
+    /* Hide scrollbars */
     ::-webkit-scrollbar { width: 0px; background: transparent; }
-    * { -ms-overflow-style: none;  scrollbar-width: none; }
+    * { -ms-overflow-style: none; scrollbar-width: none; }
 
     /* Custom Cursor */
     .custom-cursor {
@@ -118,12 +119,79 @@
 
       <div class="mt-10 pt-6 border-t border-cream/10 flex justify-between items-center">
         <span class="font-script text-2xl text-accent">Forever & Always</span>
-        <a href="#gallery" class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-cream/60 hover:text-accent transition-colors">
-          Scroll to Gallery <span>↓</span>
+        <a href="#timeline" class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-cream/60 hover:text-accent transition-colors">
+          Explore Below <span>↓</span>
         </a>
       </div>
     </div>
 
+  </section>
+
+  <section id="timeline" class="py-24 px-6 max-w-5xl mx-auto z-10 relative">
+    <div class="mb-16 text-center">
+      <span class="text-xs font-mono uppercase tracking-[0.3em] text-accent block mb-2">Our Journey</span>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold tracking-tight">MILESTONES & MEMORIES</h2>
+    </div>
+
+    <div class="relative border-l border-cream/10 ml-4 sm:ml-32 space-y-12">
+      <template x-for="(event, idx) in milestones" :key="idx">
+        <div class="relative pl-8 sm:pl-12 group">
+          <div class="absolute -left-[9px] top-1.5 w-4 h-4 rounded-full bg-surface border-2 border-accent group-hover:bg-accent transition-colors duration-300"></div>
+          
+          <span class="text-xs font-mono text-accent-soft tracking-widest uppercase block mb-1" x-text="event.date"></span>
+          <h3 class="font-display text-xl sm:text-2xl font-bold text-cream mb-2" x-text="event.title"></h3>
+          <p class="text-cream/70 text-sm sm:text-base font-light leading-relaxed max-w-xl" x-text="event.description"></p>
+        </div>
+      </template>
+    </div>
+  </section>
+
+  <section id="minigame" class="py-24 px-6 max-w-4xl mx-auto z-10 relative">
+    <div class="bg-surface/40 border border-cream/10 rounded-3xl p-8 sm:p-12 backdrop-blur-md text-center relative overflow-hidden">
+      
+      <span class="text-xs font-mono uppercase tracking-[0.3em] text-accent block mb-2">Interactive Arcade</span>
+      <h2 class="font-display text-3xl sm:text-4xl font-bold tracking-tight mb-4">CATCH THE WISHES</h2>
+      <p class="text-cream/70 text-sm sm:text-base max-w-md mx-auto mb-8 font-light">
+        Collect 5 floating birthday stars to unlock your final custom celebration toast!
+      </p>
+
+      <div class="flex justify-center items-center gap-8 mb-8 font-mono text-sm">
+        <div class="px-4 py-2 rounded-full bg-surface border border-cream/10">
+          STARS: <span class="text-accent font-bold" x-text="score"></span> / 5
+        </div>
+      </div>
+
+      <div class="relative h-64 sm:h-80 w-full bg-bg/80 rounded-2xl border border-cream/5 flex items-center justify-center overflow-hidden">
+        
+        <template x-if="!gameStarted && !gameWon">
+          <button @click="startGame()" class="px-8 py-3 rounded-full bg-accent text-bg font-semibold text-sm tracking-wider uppercase hover:bg-accent-soft transition-all duration-300 transform hover:scale-105">
+            Start Game
+          </button>
+        </template>
+
+        <template x-if="gameStarted && !gameWon">
+          <button 
+            @click="catchStar()" 
+            class="absolute p-4 text-3xl transition-all duration-300 ease-out transform -translate-x-1/2 -translate-y-1/2 hover:scale-125 focus:outline-none"
+            :style="`top: ${targetPos.top}%; left: ${targetPos.left}%;`"
+          >
+            ✨
+          </button>
+        </template>
+
+        <template x-if="gameWon">
+          <div class="text-center p-6 space-y-4" x-transition:enter="transition ease-out duration-500">
+            <span class="text-5xl block animate-bounce">🎂</span>
+            <h3 class="font-display text-2xl font-bold text-accent-soft">Wishes Unlocked!</h3>
+            <p class="text-cream/80 text-sm max-w-sm mx-auto font-light">"May your year ahead be as luminous, joyful, and brilliant as you are every single day."</p>
+            <button @click="startGame()" class="mt-4 text-xs font-mono uppercase tracking-widest text-cream/50 hover:text-cream underline">
+              Play Again
+            </button>
+          </div>
+        </template>
+
+      </div>
+    </div>
   </section>
 
   <section id="gallery" class="min-h-screen py-24 px-6 max-w-7xl mx-auto z-10 relative">
@@ -205,8 +273,38 @@
         isPlaying: false,
         lightboxOpen: false,
         activePhoto: {},
-        
-        // --- CUSTOMIZABLE PHOTO ALBUM DATA ---
+
+        // Minigame State
+        gameStarted: false,
+        gameWon: false,
+        score: 0,
+        targetPos: { top: 50, left: 50 },
+
+        // Milestones Timeline Data
+        milestones: [
+          {
+            date: 'FIRST CHAPTER',
+            title: 'Where It All Began',
+            description: 'A simple hello that completely changed the trajectory of everyday life.'
+          },
+          {
+            date: 'SUMMER 2025',
+            title: 'The Unplanned Getaway',
+            description: 'Driving through the coast without a real destination, relying solely on good music and great company.'
+          },
+          {
+            date: 'WINTER 2025',
+            title: 'Quiet Midnight Talks',
+            description: 'Late hours spent realizing how rare and special true understanding really is.'
+          },
+          {
+            date: 'TODAY',
+            title: 'Another Milestone Year',
+            description: 'Celebrating everything you are and every incredible adventure still waiting ahead.'
+          }
+        ],
+
+        // Photo Gallery Data
         photos: [
           {
             url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop',
@@ -272,6 +370,36 @@
             audio.play().catch(() => {});
           }
           this.isPlaying = !this.isPlaying;
+        },
+
+        // Minigame Logic
+        startGame() {
+          this.score = 0;
+          this.gameWon = false;
+          this.gameStarted = true;
+          this.moveStar();
+        },
+
+        moveStar() {
+          this.targetPos = {
+            top: Math.floor(Math.random() * 70) + 15,
+            left: Math.floor(Math.random() * 70) + 15
+          };
+        },
+
+        catchStar() {
+          this.score++;
+          if (this.score >= 5) {
+            this.gameWon = true;
+            this.gameStarted = false;
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
+          } else {
+            this.moveStar();
+          }
         }
       }
     }
@@ -289,7 +417,7 @@
       }
     });
 
-    // Scroll-Trigger Animations for Gallery Cards
+    // Scroll Animations
     document.addEventListener('DOMContentLoaded', () => {
       gsap.registerPlugin(ScrollTrigger);
       
