@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Happy Birthday, My Love</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Plus+Jakarta+Sans:wght@300;400;500;600&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bg: '#0F0E13',
+            surface: '#18171C',
+            cream: '#F4F1EA',
+            accent: {
+              DEFAULT: '#E29578',
+              soft: '#FFB5A7',
+              dark: '#D88373'
+            }
+          },
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'sans-serif'],
+            display: ['Syne', 'sans-serif'],
+            script: ['Alex Brush', 'cursive']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Custom Grain Overlay */
+    .bg-grain {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+    }
+
+    /* Hide scrollbars for slick look */
+    ::-webkit-scrollbar { width: 0px; background: transparent; }
+    * { -ms-overflow-style: none;  scrollbar-width: none; }
+
+    /* Custom Cursor */
+    .custom-cursor {
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s, height 0.3s, background-color 0.3s, opacity 0.3s;
+    }
+  </style>
+</head>
+
+<body x-data="appData()" class="bg-bg text-cream font-sans antialiased selection:bg-accent selection:text-bg relative overflow-x-hidden">
+
+  <div class="fixed inset-0 bg-grain pointer-events-none z-50"></div>
+
+  <div id="cursor" class="custom-cursor fixed top-0 left-0 w-4 h-4 rounded-full bg-accent-soft/60 blur-[1px] z-[100] hidden md:block mix-blend-difference"></div>
+
+  <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+    <div class="absolute -top-40 -left-40 w-96 h-96 bg-accent/15 rounded-full blur-[120px] animate-pulse"></div>
+    <div class="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-accent-dark/10 rounded-full blur-[150px]"></div>
+    <div class="absolute -bottom-40 left-1/3 w-80 h-80 bg-accent-soft/10 rounded-full blur-[100px]"></div>
+  </div>
+
+  <button @click="toggleAudio()" class="fixed top-8 right-8 z-40 flex items-center gap-3 px-4 py-2 rounded-full bg-surface/80 border border-cream/10 backdrop-blur-md hover:border-accent/40 transition-all duration-300 group">
+    <span class="text-xs font-mono uppercase tracking-widest text-cream/60 group-hover:text-cream" x-text="isPlaying ? 'Sound On' : 'Sound Off'"></span>
+    <div class="w-2.5 h-2.5 rounded-full" :class="isPlaying ? 'bg-accent animate-ping' : 'bg-cream/20'"></div>
+  </button>
+  
+  <audio id="bg-audio" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=soft-piano-ambient-111154.mp3"></audio>
+
+  <section class="min-h-screen relative flex flex-col justify-center items-center px-6 z-10 pt-20 pb-12">
+    
+    <div x-show="!letterOpen" class="flex flex-col items-center text-center cursor-pointer group" @click="openLetter()">
+      <p class="text-xs font-mono uppercase tracking-[0.3em] text-accent mb-6 opacity-80">A Special Delivery</p>
+      
+      <div class="relative w-72 h-48 sm:w-96 sm:h-64 bg-surface rounded-2xl border border-cream/10 shadow-2xl p-6 flex flex-col justify-between items-center transition-all duration-500 group-hover:-translate-y-2 group-hover:border-accent/40 group-hover:shadow-[0_20px_50px_rgba(226,149,120,0.15)]">
+        <div class="w-full flex justify-between items-center border-b border-cream/5 pb-4">
+          <span class="font-script text-2xl text-accent-soft">To My Favorite Person</span>
+          <span class="text-xs font-mono text-cream/40">01 // 01</span>
+        </div>
+        
+        <div class="my-auto text-center">
+          <span class="inline-block text-3xl mb-2 transition-transform duration-300 group-hover:scale-125">✨</span>
+          <p class="font-display text-sm tracking-wide text-cream/70">Click anywhere to open</p>
+        </div>
+
+        <div class="w-full text-right">
+          <span class="text-[10px] font-mono tracking-widest text-cream/30 uppercase">With Love</span>
+        </div>
+      </div>
+    </div>
+
+    <div x-show="letterOpen" x-transition:enter="transition ease-out duration-1000" x-transition:enter-start="opacity-0 translate-y-12" x-transition:enter-end="opacity-100 translate-y-0" class="max-w-2xl w-full bg-surface/60 border border-cream/10 backdrop-blur-xl rounded-3xl p-8 sm:p-12 shadow-2xl relative">
+      
+      <div class="flex justify-between items-start mb-8">
+        <div>
+          <span class="font-script text-3xl sm:text-4xl text-accent-soft block mb-1">Happy Birthday,</span>
+          <h1 class="font-display text-4xl sm:text-6xl font-bold tracking-tight text-cream">SOPHIA</h1>
+        </div>
+        <span class="text-xs font-mono text-cream/40 px-3 py-1 border border-cream/10 rounded-full">2026 EDITION</span>
+      </div>
+
+      <div class="space-y-6 text-cream/80 text-base sm:text-lg leading-relaxed font-light">
+        <p class="letter-line opacity-0">Today isn't just another date on the calendar; it's a celebration of every quiet moment, dynamic adventure, and beautiful memory you bring into the world.</p>
+        <p class="letter-line opacity-0">You have this incredible, rare way of making everything around you feel a little softer, brighter, and deeply meaningful.</p>
+        <p class="letter-line opacity-0">Here's to celebrating you—today, tonight, and through all the chapters ahead.</p>
+      </div>
+
+      <div class="mt-10 pt-6 border-t border-cream/10 flex justify-between items-center">
+        <span class="font-script text-2xl text-accent">Forever & Always</span>
+        <a href="#gallery" class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-cream/60 hover:text-accent transition-colors">
+          Scroll to Gallery <span>↓</span>
+        </a>
+      </div>
+    </div>
+
+  </section>
+
+  <section id="gallery" class="min-h-screen py-24 px-6 max-w-7xl mx-auto z-10 relative">
+    
+    <div class="mb-16 text-center sm:text-left">
+      <span class="text-xs font-mono uppercase tracking-[0.3em] text-accent block mb-2">Visual Vault</span>
+      <h2 class="font-display text-3xl sm:text-5xl font-bold tracking-tight">CAPTURED MOMENTS</h2>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+      <template x-for="(photo, index) in photos" :key="index">
+        <div 
+          @click="openLightbox(photo)"
+          class="gallery-card group relative bg-surface rounded-2xl overflow-hidden border border-cream/10 cursor-pointer transition-all duration-500 hover:border-accent/50 hover:shadow-[0_10px_30px_rgba(226,149,120,0.2)]"
+          :class="index % 3 === 0 ? 'lg:translate-y-6' : (index % 2 === 0 ? 'lg:-translate-y-4' : '')"
+        >
+          <div class="aspect-[4/5] overflow-hidden relative">
+            <img 
+              :src="photo.url" 
+              :alt="photo.caption"
+              class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+              loading="lazy"
+            >
+            <div class="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+          </div>
+
+          <div class="absolute bottom-0 inset-x-0 p-6 flex flex-col justify-end">
+            <span class="text-[10px] font-mono uppercase tracking-widest text-accent-soft mb-1" x-text="photo.date"></span>
+            <p class="font-display text-lg text-cream font-medium" x-text="photo.caption"></p>
+          </div>
+        </div>
+      </template>
+    </div>
+
+  </section>
+
+  <div 
+    x-show="lightboxOpen" 
+    x-transition:enter="transition ease-out duration-300"
+    x-transition:enter-start="opacity-0 backdrop-blur-none"
+    x-transition:enter-end="opacity-100 backdrop-blur-md"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="opacity-100 backdrop-blur-md"
+    x-transition:leave-end="opacity-0 backdrop-blur-none"
+    @click.self="lightboxOpen = false"
+    class="fixed inset-0 z-50 bg-bg/80 backdrop-blur-xl flex items-center justify-center p-4 sm:p-8"
+  >
+    <div class="relative max-w-4xl w-full bg-surface border border-cream/10 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+      <button @click="lightboxOpen = false" class="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-bg/50 border border-cream/10 text-cream flex items-center justify-center hover:bg-accent hover:text-bg transition-colors">
+        ✕
+      </button>
+      
+      <div class="md:w-2/3 max-h-[70vh] md:max-h-[80vh] overflow-hidden bg-black flex items-center justify-center">
+        <img :src="activePhoto.url" :alt="activePhoto.caption" class="w-full h-full object-contain">
+      </div>
+      
+      <div class="md:w-1/3 p-6 sm:p-8 flex flex-col justify-between border-t md:border-t-0 md:border-l border-cream/10">
+        <div>
+          <span class="text-xs font-mono text-accent uppercase tracking-widest block mb-2" x-text="activePhoto.date"></span>
+          <h3 class="font-display text-2xl font-bold mb-4" x-text="activePhoto.caption"></h3>
+          <p class="text-cream/70 text-sm font-light leading-relaxed" x-text="activePhoto.details"></p>
+        </div>
+        <div class="mt-8 pt-4 border-t border-cream/5 flex justify-between text-[10px] font-mono text-cream/40">
+          <span>MEMORY ARCHIVE</span>
+          <span>LIMITED EDITION</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="py-12 border-t border-cream/5 text-center text-xs font-mono text-cream/40 z-10 relative">
+    <p>Crafted exclusively for your special day.</p>
+  </footer>
+
+  <script>
+    function appData() {
+      return {
+        letterOpen: false,
+        isPlaying: false,
+        lightboxOpen: false,
+        activePhoto: {},
+        
+        // --- CUSTOMIZABLE PHOTO ALBUM DATA ---
+        photos: [
+          {
+            url: 'https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Golden Hour Reflections',
+            date: 'OCTOBER 2025',
+            details: 'That unexpected afternoon walk where the light hit everything perfectly.'
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Spontaneous Roadtrip',
+            date: 'AUGUST 2025',
+            details: 'Lost map, wrong turns, and the absolute best roadside coffee we ever found.'
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Cozy Rain Celebration',
+            date: 'DECEMBER 2025',
+            details: 'Staying indoors while it poured outside. Warm tea and endless conversations.'
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Late Night Stargazing',
+            date: 'JULY 2025',
+            details: 'Quiet fields, cool wind, and watching the midnight sky together.'
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=1200&auto=format&fit=crop',
+            caption: 'Archived Laughs',
+            date: 'MAY 2025',
+            details: 'A candid frame caught completely off-guard—the pure joy in this photo says everything.'
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1469371670807-013ccf25f16a?q=80&w=1200&auto=format&fit=crop',
+            caption: 'The Sunset View',
+            date: 'JANUARY 2026',
+            details: 'Watching the daylight fade away as we planned out all our ambitions for the coming year.'
+          }
+        ],
+
+        openLetter() {
+          this.letterOpen = true;
+          this.$nextTick(() => {
+            gsap.to('.letter-line', {
+              opacity: 1,
+              y: 0,
+              duration: 1,
+              stagger: 0.3,
+              ease: 'power3.out'
+            });
+          });
+        },
+
+        openLightbox(photo) {
+          this.activePhoto = photo;
+          this.lightboxOpen = true;
+        },
+
+        toggleAudio() {
+          const audio = document.getElementById('bg-audio');
+          if (this.isPlaying) {
+            audio.pause();
+          } else {
+            audio.play().catch(() => {});
+          }
+          this.isPlaying = !this.isPlaying;
+        }
+      }
+    }
+
+    // Custom Pointer Follower
+    document.addEventListener('mousemove', (e) => {
+      const cursor = document.getElementById('cursor');
+      if (cursor) {
+        gsap.to(cursor, {
+          x: e.clientX,
+          y: e.clientY,
+          duration: 0.2,
+          ease: 'power2.out'
+        });
+      }
+    });
+
+    // Scroll-Trigger Animations for Gallery Cards
+    document.addEventListener('DOMContentLoaded', () => {
+      gsap.registerPlugin(ScrollTrigger);
+      
+      gsap.utils.toArray('.gallery-card').forEach((card) => {
+        gsap.from(card, {
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          },
+          opacity: 0,
+          y: 40,
+          duration: 0.8,
+          ease: 'power3.out'
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
